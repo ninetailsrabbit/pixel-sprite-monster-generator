@@ -3,7 +3,7 @@ class_name PixelSpriteMonsterGenerator extends Node2D
 
 ## The sprite size at which the sprite will be generated
 @export var sprite_size: Vector2 = Vector2(48, 48)
-@export var sprite_draw_rect: Vector2 = Vector2(256, 256)
+@export var sprite_draw_rect: Vector2 = Vector2(128, 128)
 ## A symmetry of 100 % draw a more organic monster with symmetrical sides, the less symmetry, the more chaotic the final monster.
 @export_range(0, 100.0, 0.1) var symmetry: float = 100.0
 ## When pixel perfect it's enabled, the final result will be more 'pixelated' and squared
@@ -16,9 +16,9 @@ class_name PixelSpriteMonsterGenerator extends Node2D
 ## The number of colors to generate the sprie palette
 @export var number_of_colors: int = 12
 ## This noise shapes the color fill using the generated palette
-@export var main_noise: FastNoiseLite
+@export var main_noise: FastNoiseLite = preload("res://addons/ninetailsrabbit.pixel_sprite_monster_generator/src/noises/main_noise.tres")
 ## This secondary noise shapes the color fill using the generated palette
-@export var secondary_noise: FastNoiseLite
+@export var secondary_noise: FastNoiseLite = preload("res://addons/ninetailsrabbit.pixel_sprite_monster_generator/src/noises/secondary_noise.tres")
 @export_category("Cellular automata")
 ## More the steps, more detailed the final result
 @export var steps: int = 4
@@ -53,7 +53,11 @@ func draw_sprite() -> void:
 	
 	seed(randi() if randomize_seed else manual_seed)
 	
-	var map: Array[Variant] = map_generator.generate_new(Vector2(64, 64), 100)
+	if randomize_seed:
+		main_noise.seed = randi()
+		secondary_noise.seed = randi()
+	
+	var map: Array[Variant] = map_generator.generate_new(Vector2(64, 64), symmetry)
 	map = cellular_automata.do_steps(map)
 	
 	var scheme: PackedColorArray = color_scheme_generator.generate_new_colorscheme(4)
@@ -67,10 +71,16 @@ func draw_sprite() -> void:
 	g_draw.groups = all_color_groups.groups
 	g_draw.negative_groups = all_color_groups.negative_groups
 	g_draw.draw_size = 1 if pixel_perfect else draw_size
-
+	
 	add_child(g_draw)
 	
 	
 func clear() -> void:
 	for child in get_children():
 		child.free()
+
+#region Helpers
+func _set_owner_to_edited_scene_root(node: Node) -> void:
+	if Engine.is_editor_hint() and node.get_tree():
+		node.owner = node.get_tree().edited_scene_root
+#endregion

@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://01ptspjr6ajs"]
+
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.pixel_sprite_monster_generator/src/sprite_generator.gd" id="1_64tup"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_d8c3g"]
+noise_type = 2
+frequency = 0.004
+fractal_lacunarity = 3.0
+fractal_gain = 0.4
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2pktk"]
+noise_type = 2
+frequency = 0.004
+fractal_octaves = 3
+fractal_lacunarity = 3.0
+fractal_gain = 0.4
+
+[node name="Test" type="Node2D"]
+
+[node name="PixelSpriteMonsterGenerator" type="Node2D" parent="."]
+position = Vector2(338, 206)
+script = ExtResource("1_64tup")
+main_noise = SubResource("FastNoiseLite_d8c3g")
+secondary_noise = SubResource("FastNoiseLite_2pktk")

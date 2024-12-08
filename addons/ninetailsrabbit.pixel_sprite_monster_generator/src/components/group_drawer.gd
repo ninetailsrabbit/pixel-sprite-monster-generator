@@ -25,8 +25,20 @@ var vertical_animation = true:
 			
 			for cell: CellDrawer in cells():
 				cell.vertical_animation = vertical_animation
-var speed: float = 5.0
-var smooth_lerp_factor: float = 20.0
+var speed: float = 5.0:
+	set(value):
+		if value != speed:
+			speed = value
+			
+			for cell: CellDrawer in cells():
+				cell.speed = speed
+var smooth_lerp_factor: float = 20.0:
+	set(value):
+		if value != smooth_lerp_factor:
+			smooth_lerp_factor = value
+			
+			for cell: CellDrawer in cells():
+				cell.smooth_lerp_factor = smooth_lerp_factor
 
 
 func _enter_tree() -> void:

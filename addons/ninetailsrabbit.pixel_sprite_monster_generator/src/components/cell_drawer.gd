@@ -1,12 +1,22 @@
 class_name CellDrawer extends Node2D
 
-var cells = []
-var draw_size = 6
-var speed = 5
+var cells: Array[Variant] = []
+var draw_size: int = 6
+var speed: float = 5.0
+var smooth_lerp_factor: float = 20.0
 var lifetime = 0
-var is_eye = false
+var is_eye: bool = false
 var amplitude = 0
-var movement = true
+var animation: bool = true:
+	set(value):
+		if value !=  animation:
+			animation = value
+			set_process(animation)
+			
+var horizontal_animation: bool = true
+var vertical_animation: bool = true
+
+@onready var cell_group_drawer: CellGroupDrawer = get_parent() as CellGroupDrawer
 
 
 func _enter_tree() -> void:
@@ -14,13 +24,35 @@ func _enter_tree() -> void:
 
 
 func _ready():
-	amplitude = (lifetime % 5 + 2) * 5.0
+	amplitude = (lifetime % 5 + 2) * speed
+
+	set_process(animation)
 
 
-func set_cells(c):
-	cells = c
+func _process(delta):
+	if animation:
+		lifetime += delta * speed
+		
+		if horizontal_animation:
+			position.x = cos(lifetime) * smooth_lerp_factor
+			
+		if vertical_animation:
+			position.y = sin(lifetime) * smooth_lerp_factor
+
+
+func set_eye():
+	is_eye = true
+	queue_redraw()
+	
+	
+func set_cells(new_cells):
+	cells = new_cells
 
 	queue_redraw()
+
+
+func set_speed(new_speed: float):
+	speed = new_speed
 
 
 func _draw():
@@ -36,21 +68,8 @@ func _draw():
 	
 	average = average / cells.size()
 	
-	for c in cells:
-		draw_rect(Rect2(c.position.x*draw_size, c.position.y*draw_size, draw_size, draw_size), c.color)
+	for cell in cells:
+		draw_rect(Rect2(cell.position.x * draw_size, cell.position.y * draw_size, draw_size, draw_size), cell.color)
 		
-		if is_eye && average.distance_to(c.position) < eye_cutoff:
-			draw_rect(Rect2(c.position.x * draw_size, c.position.y * draw_size, draw_size, draw_size), c.color.darkened(0.85))
-
-func set_speed(s):
-	speed = s
-
-
-#func _process(delta):
-	#if movement:
-		#lifetime += delta * 4.0
-		#position.y = sin(lifetime) * 20
-
-func set_eye():
-	is_eye = true
-	queue_redraw()
+		if is_eye && average.distance_to(cell.position) < eye_cutoff:
+			draw_rect(Rect2(cell.position.x * draw_size, cell.position.y * draw_size, draw_size, draw_size), cell.color.darkened(0.85))

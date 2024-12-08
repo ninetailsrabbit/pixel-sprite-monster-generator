@@ -3,7 +3,7 @@ class_name PixelSpriteMonsterGenerator extends Node2D
 
 ## The sprite size at which the sprite will be generated
 @export var sprite_size: Vector2 = Vector2(48, 48)
-@export var sprite_draw_rect: Vector2 = Vector2(128, 128)
+@export var sprite_draw_size: Vector2 = Vector2(128, 128)
 ## A symmetry of 100 % draw a more organic monster with symmetrical sides, the less symmetry, the more chaotic the final monster.
 @export_range(0, 100.0, 0.1) var symmetry: float = 100.0
 ## When pixel perfect it's enabled, the final result will be more 'pixelated' and squared
@@ -12,9 +12,39 @@ class_name PixelSpriteMonsterGenerator extends Node2D
 ## The randomization of seed when it comes to generate the sprite. When this is false, the manual seed is used instead
 @export var randomize_seed: bool = true
 @export var manual_seed: int = 0
+@export_category("Cell Draw")
+@export var cell_animation: bool = true:
+	set(value):
+		if value != cell_animation:
+			cell_animation = value
+			update_group_drawer()
+@export var cell_horizontal_animation: bool = false:
+	set(value):
+		if value != cell_horizontal_animation:
+			cell_horizontal_animation = value
+			update_group_drawer()
+@export var cell_vertical_animation: bool = true:
+	set(value):
+		if value != cell_vertical_animation:
+			cell_vertical_animation = value
+			update_group_drawer()
+@export var cell_animation_speed: float =  5.0:
+	set(value):
+		if value != cell_animation_speed:
+			cell_animation_speed = value
+			update_group_drawer()
+@export var cell_smooth_lerp_factor: float =  20.0:
+	set(value):
+		if value != cell_smooth_lerp_factor:
+			cell_smooth_lerp_factor = value
+			update_group_drawer()
 @export_category("Color scheme")
 ## The number of colors to generate the sprie palette
-@export var number_of_colors: int = 12
+@export var number_of_colors: int = 12:
+	set(value):
+		if value != number_of_colors:
+			number_of_colors = value
+			update_group_drawer()
 ## This noise shapes the color fill using the generated palette
 @export var main_noise: FastNoiseLite = preload("res://addons/ninetailsrabbit.pixel_sprite_monster_generator/src/noises/main_noise.tres")
 ## This secondary noise shapes the color fill using the generated palette
@@ -32,6 +62,11 @@ var map_generator: MapGenerator
 var cellular_automata: CellularAutomata
 var color_scheme_generator: ColorSchemeGenerator
 var color_filler: ColorFiller
+
+var cell_group_drawer: CellGroupDrawer
+var scheme: PackedColorArray 
+var eye_scheme: PackedColorArray
+var all_color_groups: Dictionary = {}
 
 
 func _enter_tree() -> void:
@@ -57,22 +92,35 @@ func draw_sprite() -> void:
 		main_noise.seed = randi()
 		secondary_noise.seed = randi()
 	
-	var map: Array[Variant] = map_generator.generate_new(Vector2(64, 64), symmetry)
+	var map: Array[Variant] = map_generator.generate_new(sprite_size, symmetry)
 	map = cellular_automata.do_steps(map)
 	
-	var scheme: PackedColorArray = color_scheme_generator.generate_new_colorscheme(4)
-	var eye_scheme: PackedColorArray = color_scheme_generator.generate_new_colorscheme(4)
-	var all_color_groups: Dictionary = color_filler.fill_colors(map, scheme, eye_scheme, 4, outlined)
+	scheme = color_scheme_generator.generate_new_colorscheme(number_of_colors)
+	eye_scheme = color_scheme_generator.generate_new_colorscheme(number_of_colors)
+	all_color_groups = color_filler.fill_colors(map, scheme, eye_scheme, number_of_colors, outlined)
 	
-	var draw_size = min((sprite_draw_rect.x / sprite_size.x), (sprite_draw_rect.y / sprite_size.y))
+	update_group_drawer()
+
+
+func update_group_drawer() -> void:
+	if cell_group_drawer == null:
+		cell_group_drawer = CellGroupDrawer.new()
 	
-	var g_draw = GroupDrawer.new()
-	g_draw.position = Vector2.ZERO
-	g_draw.groups = all_color_groups.groups
-	g_draw.negative_groups = all_color_groups.negative_groups
-	g_draw.draw_size = 1 if pixel_perfect else draw_size
+	if all_color_groups.is_empty():
+		return
+		
+	cell_group_drawer.position = Vector2.ZERO
+	cell_group_drawer.groups = all_color_groups.groups
+	cell_group_drawer.negative_groups = all_color_groups.negative_groups
+	cell_group_drawer.draw_size = 1 if pixel_perfect else min((sprite_draw_size.x / sprite_size.x), (sprite_draw_size.y / sprite_size.y))
+	cell_group_drawer.animation = cell_animation
+	cell_group_drawer.horizontal_animation = cell_horizontal_animation
+	cell_group_drawer.vertical_animation = cell_vertical_animation
+	cell_group_drawer.speed = cell_animation_speed
+	cell_group_drawer.smooth_lerp_factor = cell_smooth_lerp_factor
 	
-	add_child(g_draw)
+	if not cell_group_drawer.is_inside_tree():
+		add_child(cell_group_drawer)
 	
 	
 func clear() -> void:

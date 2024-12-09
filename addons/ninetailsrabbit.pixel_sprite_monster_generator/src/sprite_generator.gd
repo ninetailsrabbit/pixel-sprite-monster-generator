@@ -86,8 +86,8 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	assert(main_noise != null, "PixelSpriteMonsterGenerator: This generator needs a main noise (FastNoiseLite)")
-	assert(secondary_noise != null, "PixelSpriteMonsterGenerator: This generator needs a secondary noise (FastNoiseLite)")
+	assert(main_noise != null, "PixelSpriteMonsterGenerator: This generator needs a main noise (FastNoiseLite) to fill the colors in the generated monster")
+	assert(secondary_noise != null, "PixelSpriteMonsterGenerator: This generator needs a secondary noise (FastNoiseLite) to fill the negative colors in the generated monster")
 	
 	draw_sprite()
 

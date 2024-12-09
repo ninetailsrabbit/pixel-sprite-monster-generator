@@ -12,7 +12,7 @@ func _enter_tree() -> void:
 	if not DirAccess.dir_exists_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath):
 		DirAccess.make_dir_recursive_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath)
 	
-	add_custom_type("PixelSpriteMonsterGenerator", "Node2D", preload("src/sprite_generator.gd"), null)
+	add_custom_type("PixelSpriteMonsterGenerator", "Node2D", preload("src/sprite_generator.gd"), preload("assets/pixel-monster-sprite-generator.svg"))
 
 
 func _exit_tree() -> void:

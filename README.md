@@ -36,7 +36,7 @@ To better understand what branch to choose from for which Godot version, please 
 
 # Getting started 🚀
 
-This project brings the [Pixel sprite generator](deep-fold.itch.io/pixel-sprite-generator) created by the user [Deep-Fold](https://github.com/Deep-Fold) to the Godot 4 version.
+This project brings the [Pixel sprite generator](https://deep-fold.itch.io/pixel-sprite-generator) created by the user [Deep-Fold](https://github.com/Deep-Fold) to the Godot 4 version.
 
 ## Features 👾
 

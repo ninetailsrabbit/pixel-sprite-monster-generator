@@ -45,7 +45,7 @@ class_name PixelSpriteMonsterGenerator extends Node2D
 			cell_smooth_lerp_factor = value
 			update_group_drawer()
 @export_category("Color scheme")
-@export var custom_color_palette: PackedColorArray = PackedColorArray()
+@export var custom_color_palette: ColorPalette
 ## The method to generate the colors, rgb is more random and hsv keeps a consistency on the color palette generated
 @export var color_generation_method: ColorSchemeGenerator.ColorGenerationMethod = ColorSchemeGenerator.ColorGenerationMethod.GoldenRatioHSV
 @export var color_saturation: float = 0.5
@@ -104,11 +104,12 @@ func draw_sprite() -> void:
 	var map: Array[Variant] = map_generator.generate_new(sprite_size, symmetry)
 	map = cellular_automata.do_steps(map)
 	
-	var num_of_colors: int = custom_color_palette.size() if custom_color_palette.size() > 0 else number_of_colors
+	var custom_color_palette_exists: bool = custom_color_palette != null and custom_color_palette.colors.size() > 0
+	var num_of_colors: int = custom_color_palette.colors.size() if custom_color_palette_exists  else number_of_colors
 	
-	if custom_color_palette.size() > 0:
-		scheme = custom_color_palette
-		eye_scheme = custom_color_palette
+	if custom_color_palette_exists:
+		scheme = custom_color_palette.colors
+		eye_scheme = custom_color_palette.colors
 	else:
 		if _color_generation_is_hsv():
 			scheme = color_scheme_generator.generate_random_hsv_colors(num_of_colors, color_saturation, color_value)

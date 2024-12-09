@@ -8,6 +8,10 @@
 
 config_version=5
 
+[Pixel-Sprite-Monster-Generator]
+
+config/ninetailsrabbit.pixel_sprite_monster_generator/update_notification_enabled=true
+
 [application]
 
 config/name="Pixel-Sprite-Monster-Generator"

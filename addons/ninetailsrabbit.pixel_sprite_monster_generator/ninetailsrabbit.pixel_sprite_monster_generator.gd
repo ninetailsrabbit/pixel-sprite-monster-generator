@@ -23,6 +23,7 @@ func _exit_tree() -> void:
 		update_notify_tool_instance.free()
 		update_notify_tool_instance = null
 		
+	remove_custom_type("ColorPalette")
 	remove_custom_type("PixelSpriteMonsterGenerator")
 
 ## Update tool referenced from https://github.com/MikeSchulze/gdUnit4/blob/master/addons/gdUnit4

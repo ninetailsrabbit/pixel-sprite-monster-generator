@@ -9,6 +9,12 @@ class_name PixelSpriteMonsterGenerator extends Node2D
 ## When pixel perfect it's enabled, the final result will be more 'pixelated' and squared
 @export var pixel_perfect: bool = false
 @export var outlined: bool = true
+## The number of colors to generate the sprie palette
+@export var number_of_colors: int = 12:
+	set(value):
+		if value != number_of_colors:
+			number_of_colors = value
+			update_group_drawer()
 ## The randomization of seed when it comes to generate the sprite. When this is false, the manual seed is used instead
 @export var randomize_seed: bool = true
 @export var manual_seed: int = 0
@@ -39,12 +45,15 @@ class_name PixelSpriteMonsterGenerator extends Node2D
 			cell_smooth_lerp_factor = value
 			update_group_drawer()
 @export_category("Color scheme")
-## The number of colors to generate the sprie palette
-@export var number_of_colors: int = 12:
-	set(value):
-		if value != number_of_colors:
-			number_of_colors = value
-			update_group_drawer()
+@export var custom_color_palette: PackedColorArray = PackedColorArray()
+## The method to generate the colors, rgb is more random and hsv keeps a consistency on the color palette generated
+@export var color_generation_method: ColorSchemeGenerator.ColorGenerationMethod = ColorSchemeGenerator.ColorGenerationMethod.GoldenRatioHSV
+@export var color_saturation: float = 0.5
+@export var color_value: float = 0.95
+@export var eye_color_generation_method: ColorSchemeGenerator.ColorGenerationMethod = ColorSchemeGenerator.ColorGenerationMethod.GoldenRatioHSV
+@export var eye_color_saturation: float = 0.5
+@export var eye_color_value: float = 0.95
+@export_category("Color filler")
 ## This noise shapes the color fill using the generated palette
 @export var main_noise: FastNoiseLite = preload("res://addons/ninetailsrabbit.pixel_sprite_monster_generator/src/noises/main_noise.tres")
 ## This secondary noise shapes the color fill using the generated palette
@@ -95,9 +104,23 @@ func draw_sprite() -> void:
 	var map: Array[Variant] = map_generator.generate_new(sprite_size, symmetry)
 	map = cellular_automata.do_steps(map)
 	
-	scheme = color_scheme_generator.generate_new_colorscheme(number_of_colors)
-	eye_scheme = color_scheme_generator.generate_new_colorscheme(number_of_colors)
-	all_color_groups = color_filler.fill_colors(map, scheme, eye_scheme, number_of_colors, outlined)
+	var num_of_colors: int = custom_color_palette.size() if custom_color_palette.size() > 0 else number_of_colors
+	
+	if custom_color_palette.size() > 0:
+		scheme = custom_color_palette
+		eye_scheme = custom_color_palette
+	else:
+		if _color_generation_is_hsv():
+			scheme = color_scheme_generator.generate_random_hsv_colors(num_of_colors, color_saturation, color_value)
+		elif _color_generation_is_random_rgb():
+			scheme = color_scheme_generator.generate_random_rgb_colors(num_of_colors)
+		
+		if _eye_color_generation_is_hsv():
+			eye_scheme = color_scheme_generator.generate_random_hsv_colors(num_of_colors, color_saturation, color_value)
+		elif _eye_color_generation_is_random_rgb():
+			eye_scheme = color_scheme_generator.generate_random_rgb_colors(num_of_colors)
+			
+	all_color_groups = color_filler.fill_colors(map, scheme, eye_scheme, num_of_colors, outlined)
 	
 	update_group_drawer()
 
@@ -127,7 +150,24 @@ func clear() -> void:
 	for child in get_children():
 		child.free()
 
+
 #region Helpers
+func _color_generation_is_hsv() -> bool:
+	return color_generation_method == ColorSchemeGenerator.ColorGenerationMethod.GoldenRatioHSV
+
+
+func _color_generation_is_random_rgb() -> bool:
+	return color_generation_method == ColorSchemeGenerator.ColorGenerationMethod.RandomRGB
+
+
+func _eye_color_generation_is_hsv() -> bool:
+	return eye_color_generation_method == ColorSchemeGenerator.ColorGenerationMethod.GoldenRatioHSV
+
+
+func _eye_color_generation_is_random_rgb() -> bool:
+	return eye_color_generation_method == ColorSchemeGenerator.ColorGenerationMethod.RandomRGB
+
+
 func _set_owner_to_edited_scene_root(node: Node) -> void:
 	if Engine.is_editor_hint() and node.get_tree():
 		node.owner = node.get_tree().edited_scene_root

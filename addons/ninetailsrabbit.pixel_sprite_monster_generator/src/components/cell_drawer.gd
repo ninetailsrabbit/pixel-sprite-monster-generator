@@ -27,7 +27,7 @@ func _ready():
 	amplitude = (lifetime % 5 + 2) * speed
 
 	set_process(animation)
-
+	
 
 func _process(delta):
 	if animation:
@@ -47,7 +47,6 @@ func set_eye():
 	
 func set_cells(new_cells):
 	cells = new_cells
-
 	queue_redraw()
 
 

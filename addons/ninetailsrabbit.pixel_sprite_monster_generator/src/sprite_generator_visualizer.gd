@@ -34,7 +34,7 @@ func draw_sprite() -> void:
 	var eye_scheme: PackedColorArray = color_scheme_generator.generate_new_colorscheme(4)
 	var all_color_groups: Dictionary = color_filler.fill_colors(map, scheme, eye_scheme, 4, true)
 	
-	var g_draw = GroupDrawer.new()
+	var g_draw = CellGroupDrawer.new()
 	g_draw.groups = all_color_groups.groups
 	g_draw.negative_groups = all_color_groups.negative_groups
 	

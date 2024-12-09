@@ -162,11 +162,11 @@ func get_color(map: Array[Variant], pos: Vector2, is_negative: bool, right, left
 				})
 
 	# highlight colors if the difference in colors between neighbours is big
-	var c_0 = colorscheme[floorf(main_noise.get_noise_2d(col_x, pos.y) * (n_colors-1))]
-	var c_1 = colorscheme[floorf(main_noise.get_noise_2d(col_x, pos.y - 1) * (n_colors-1))]
-	var c_2 = colorscheme[floorf(main_noise.get_noise_2d(col_x, pos.y + 1) * (n_colors-1))]
-	var c_3 = colorscheme[floorf(main_noise.get_noise_2d(col_x - 1, pos.y) * (n_colors-1))]
-	var c_4 = colorscheme[floorf(main_noise.get_noise_2d(col_x + 1, pos.y) * (n_colors-1))]
+	var c_0 = colorscheme[floorf(main_noise.get_noise_2d(col_x, pos.y) * (n_colors- 1))]
+	var c_1 = colorscheme[floorf(main_noise.get_noise_2d(col_x, pos.y - 1) * (n_colors- 1))]
+	var c_2 = colorscheme[floorf(main_noise.get_noise_2d(col_x, pos.y + 1) * (n_colors- 1))]
+	var c_3 = colorscheme[floorf(main_noise.get_noise_2d(col_x - 1, pos.y) * (n_colors- 1))]
+	var c_4 = colorscheme[floorf(main_noise.get_noise_2d(col_x + 1, pos.y) * (n_colors- 1))]
 	var diff = ((abs(c_0.r - c_1.r) + abs(c_0.g - c_1.g) + abs(c_0.b - c_1.b)) + 
 				(abs(c_0.r - c_2.r) + abs(c_0.g - c_2.g) + abs(c_0.b - c_2.b)) + 
 				(abs(c_0.r - c_3.r) + abs(c_0.g - c_3.g) + abs(c_0.b - c_3.b)) + 
